@@ -8,6 +8,7 @@ declare global {
       NEXTAUTH_SECRET: string
       SANITY_TOKEN: string
       SANITY_WEBHOOK_SECRET: string
+      MONGODB_URI: string
     }
   }
 }
