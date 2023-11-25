@@ -5,13 +5,13 @@ import { sanityFetch } from '../sanity'
 import { product } from '@/types'
 import { urlFor } from '../sanity'
 import { getServerSession } from 'next-auth'
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 export async function pay(product_id: string) {
-  const userSession = await getServerSession()
-  console.log(userSession)
-  // if (status === 'unauthenticated' || !data?.user?.email) redirect('/auth')
+  const userSession = await getServerSession(authOptions)
+  if (!userSession?.user?.email) return redirect('/api/auth/signin')
 
   const product: product | null = await sanityFetch(`*[_type == "product" && _id == "${product_id}"][0]`)
   if (!product) return
@@ -26,13 +26,10 @@ export async function pay(product_id: string) {
           unit_amount: product.price * 100,
           product_data: { name, description, images: [imageURL] },
         },
-        phone_number_collection: {
-          enabled: true,
-        },
         quantity: 1,
       },
     ],
-    // customer_email: data.user.email,
+    customer_email: userSession.user.email,
     mode: 'payment',
     success_url: `${process.env.URL}/Success`,
     cancel_url: `${process.env.URL}`,

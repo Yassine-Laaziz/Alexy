@@ -92,14 +92,14 @@ export default function Modal({ open, setOpen, product }: props) {
                     {step === 0 && 'Have a session'}
                     {step === 1 && (
                       <>
-                        <button className='ml-2'>Next</button>
+                        <span className='ml-2'>Next</span>
                         {value ? <CheckCircleIcon className='h-6 w-6' /> : <XCircleIcon className='h-6 w-6' />}
                       </>
                     )}
                     {step === 2 && (
-                      <button className='ml-2' onClick={() => pay(product._id)}>
+                      <span className='ml-2' onClick={() => pay(product._id)}>
                         Confirm
-                      </button>
+                      </span>
                     )}
                   </button>
                   {/* Prev Button */}
