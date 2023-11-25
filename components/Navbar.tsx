@@ -3,7 +3,7 @@
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { classNames } from '../lib/headlessui'
+import { classNames } from '../lib/utils/classNames'
 import Image from 'next/image'
 import { navVariants } from '@/lib/motion'
 import { motion } from 'framer-motion'

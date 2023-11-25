@@ -1,17 +1,23 @@
 'use server'
 
-import { permanentRedirect } from 'next/navigation'
+import { redirect } from 'next/navigation'
 import { sanityFetch } from '../sanity'
 import { product } from '@/types'
 import { urlFor } from '../sanity'
+import { getServerSession } from 'next-auth'
 
-export default async function pay(product_id: string) {
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+
+export async function pay(product_id: string) {
+  const userSession = await getServerSession()
+  console.log(userSession)
+  // if (status === 'unauthenticated' || !data?.user?.email) redirect('/auth')
+
   const product: product | null = await sanityFetch(`*[_type == "product" && _id == "${product_id}"][0]`)
   if (!product) return
   const { name, description, image } = product
   const imageURL = urlFor(image).url()
 
-  const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
   const session = await stripe.checkout.sessions.create({
     line_items: [
       {
@@ -20,12 +26,16 @@ export default async function pay(product_id: string) {
           unit_amount: product.price * 100,
           product_data: { name, description, images: [imageURL] },
         },
+        phone_number_collection: {
+          enabled: true,
+        },
         quantity: 1,
       },
     ],
+    // customer_email: data.user.email,
     mode: 'payment',
-    success_url: `${process.env.URL}/Result/?success=true`,
-    cancel_url: `${process.env.URL}/Result/?canceled=true`,
+    success_url: `${process.env.URL}/Success`,
+    cancel_url: `${process.env.URL}`,
   })
-  permanentRedirect(session.url)
+  redirect(session.url)
 }

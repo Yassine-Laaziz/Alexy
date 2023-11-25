@@ -2,12 +2,12 @@ import { Dispatch, Fragment, SetStateAction, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { product } from '@/types'
 import Calendar from 'react-calendar'
-import { CheckCircleIcon, ExclamationCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
+import { CalendarDaysIcon, CheckCircleIcon, ExclamationCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import '../styles/React-Calendar.css'
 import { loadStripe } from '@stripe/stripe-js'
-import pay from '@/lib/ServerActions/Stripe'
+import { pay } from '@/lib/ServerFunctions/Stripe'
 
 export default function Modal({ open, setOpen, product }: props) {
   const [step, setStep] = useState<number>(0)
@@ -22,7 +22,7 @@ export default function Modal({ open, setOpen, product }: props) {
   oneMonthFromNow.setMonth(today.getMonth() + 1)
 
   function handleNextStep() {
-    if (step === 3) return
+    if (step === 2) return
     if (step === 1 && !value) {
       return toast.info('Select the date first', {
         position: 'top-center',
@@ -80,7 +80,7 @@ export default function Modal({ open, setOpen, product }: props) {
                     showNeighboringMonth={false}
                   />
                 )}
-                {step === 2 && <Payment value={value} product_id={product._id} />}
+                {step === 2 && <Payment value={value} />}
                 {/* Next Button */}
                 <div className='bg-gray-50 px-4 py-3 c:focus:border-2 sm:flex sm:flex-row-reverse sm:px-6'>
                   <button
@@ -92,11 +92,15 @@ export default function Modal({ open, setOpen, product }: props) {
                     {step === 0 && 'Have a session'}
                     {step === 1 && (
                       <>
-                        <span className='ml-2'>Next</span>
-                        {value ? <CheckCircleIcon className='h-6 w-6 text-green-400' /> : <XCircleIcon className='h-6 w-6' />}
+                        <button className='ml-2'>Next</button>
+                        {value ? <CheckCircleIcon className='h-6 w-6' /> : <XCircleIcon className='h-6 w-6' />}
                       </>
                     )}
-                    {step === 2 && <span className='ml-2'>Confirm</span>}
+                    {step === 2 && (
+                      <button className='ml-2' onClick={() => pay(product._id)}>
+                        Confirm
+                      </button>
+                    )}
                   </button>
                   {/* Prev Button */}
                   <button
@@ -116,7 +120,7 @@ export default function Modal({ open, setOpen, product }: props) {
   )
 }
 
-function Info({ product }: InfoProps) {
+function Info({ product }: { product: product }) {
   return (
     <>
       <div className='px-4 pb-4 pt-5 sm:p-6 sm:pb-4'>
@@ -139,18 +143,17 @@ function Info({ product }: InfoProps) {
 // @ts-ignore
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
 
-function Payment({ value, product_id }: PaymentProps) {
+function Payment({ value }: { value: Value }) {
   if (!value || Array.isArray(value)) value = null
   const datePart = value ? new Date(value).toLocaleDateString() : ''
 
   return (
-    //@ts-ignore because this is a Next.js Server Actions 'type' issue
-    <form action={pay(product_id)} method='POST'>
-      {datePart}
-      <button type='submit' role='link'>
-        Checkout
-      </button>
-    </form>
+    <div className='mx-auto mt-8 max-w-md rounded-md bg-gray-100 p-4 shadow-md'>
+      <h2 className='mb-4 text-2xl font-bold'>Confirm Session and Checkout</h2>
+      <span className='mt-2 text-lg font-bold text-blue-500'>
+        <CalendarDaysIcon className='inline-block h-10 w-10' /> @{datePart}
+      </span>
+    </div>
   )
 }
 
@@ -162,12 +165,4 @@ interface props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   product: product
-}
-
-interface InfoProps {
-  product: product
-}
-interface PaymentProps {
-  value: Value
-  product_id: string
 }
