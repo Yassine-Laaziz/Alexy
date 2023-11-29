@@ -65,9 +65,9 @@ export default function Modal({ open, setOpen, product }: props) {
                 <ToastContainer />
 
                 {[
-                  <Info product={product} />,
-                  <CustomCalendar value={value} onChange={onChange} />,
-                  <Payment value={value} />,
+                  <Info product={product} key={`Component-Array-Element-1`} />,
+                  <CustomCalendar value={value} onChange={onChange} key={`Component-Array-Element-2`} />,
+                  <Payment value={value} key={`Component-Array-Element-3`} />,
                 ].map((Component, i) => (
                   <Transition
                     key={`Modal-Step-${i}`}
