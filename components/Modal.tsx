@@ -2,7 +2,8 @@ import { Dispatch, Fragment, SetStateAction, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { product } from '@/types'
 import Calendar from 'react-calendar'
-import { CalendarDaysIcon, CheckCircleIcon, ExclamationCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
+import { FaCheck, FaExclamationCircle } from 'react-icons/fa'
+import { FaXmark } from 'react-icons/fa6'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import '../styles/React-Calendar.css'
@@ -13,14 +14,6 @@ export default function Modal({ open, setOpen, product }: props) {
   const [step, setStep] = useState<number>(0)
   const [value, onChange] = useState<Value>(null)
 
-  // Calendar MinDate and MaxDate
-  const today = new Date()
-  const tomorrow = new Date(today)
-  tomorrow.setDate(today.getDate() + 1)
-  // Calculate a month from now
-  const oneMonthFromNow = new Date(today)
-  oneMonthFromNow.setMonth(today.getMonth() + 1)
-
   function handleNextStep() {
     if (step === 2) return
     if (step === 1 && !value) {
@@ -28,10 +21,10 @@ export default function Modal({ open, setOpen, product }: props) {
         position: 'top-center',
         autoClose: 2500,
         toastId: 'No-duplicate',
-        icon: <ExclamationCircleIcon className='text-pink-500' />,
+        icon: <FaExclamationCircle className='text-pink-500' />,
         theme: 'light',
         style: { color: 'rgb(236 72 153)', fontSize: '18px' },
-        closeButton: <XCircleIcon className='h-7 w-7 text-sky-300' />,
+        closeButton: <FaXmark className='h-7 w-7 text-sky-300' />,
       })
     }
     setStep(prev => prev + 1)
@@ -70,17 +63,25 @@ export default function Modal({ open, setOpen, product }: props) {
             >
               <Dialog.Panel className='relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg'>
                 <ToastContainer />
-                {step === 0 && <Info product={product} />}
-                {step === 1 && (
-                  <Calendar
-                    value={value}
-                    onChange={onChange}
-                    maxDate={oneMonthFromNow}
-                    minDate={tomorrow}
-                    showNeighboringMonth={false}
-                  />
-                )}
-                {step === 2 && <Payment value={value} />}
+
+                {[
+                  <Info product={product} />,
+                  <CustomCalendar value={value} onChange={onChange} />,
+                  <Payment value={value} />,
+                ].map((Component, i) => (
+                  <Transition
+                    key={`slide-${i}`}
+                    show={i === step}
+                    enter='transition-all  duration-1000'
+                    enterFrom='opacity-0'
+                    enterTo='opacity-100'
+                    leave='transition-opacity duration-1000'
+                    leaveFrom='opacity-100'
+                    leaveTo='opacity-0'
+                  >
+                    {Component}
+                  </Transition>
+                ))}
                 {/* Next Button */}
                 <div className='bg-gray-50 px-4 py-3 c:focus:border-2 sm:flex sm:flex-row-reverse sm:px-6'>
                   <button
@@ -93,7 +94,7 @@ export default function Modal({ open, setOpen, product }: props) {
                     {step === 1 && (
                       <>
                         <span className='ml-2'>Next</span>
-                        {value ? <CheckCircleIcon className='h-6 w-6' /> : <XCircleIcon className='h-6 w-6' />}
+                        {value ? <FaCheck className='h-6 w-6' /> : <FaXmark className='h-6 w-6' />}
                       </>
                     )}
                     {step === 2 && (
@@ -123,16 +124,12 @@ export default function Modal({ open, setOpen, product }: props) {
 function Info({ product }: { product: product }) {
   return (
     <>
-      <div className='px-4 pb-4 pt-5 sm:p-6 sm:pb-4'>
+      <div className='px-7 pb-5 pt-6 sm:p-6 sm:pb-4'>
         <div className='mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left'>
           <Dialog.Title as='h3' className='text-base font-semibold leading-6 text-pink-400'>
             {product.name}
           </Dialog.Title>
-          <p className='mt-2 text-sm text-slate-500'>
-            {/* {product.description} */}
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo qui ratione animi inventore sit temporibus rem nisi ea
-            repudiandae deleniti, aperiam voluptatum libero pariatur suscipit quam distinctio in. Perspiciatis, doloremque.
-          </p>
+          <p className='mt-2 pr-7 text-slate-500'>{product.description}</p>
         </div>
       </div>
       <p className='pr-6 text-right font-bold text-cyan-400'>{product.price}$</p>
@@ -140,19 +137,31 @@ function Info({ product }: { product: product }) {
   )
 }
 
+function CustomCalendar({ value, onChange }: { value: Value; onChange: Dispatch<SetStateAction<Value>> }) {
+  // Calendar MinDate and MaxDate
+  const today = new Date()
+  const tomorrow = new Date(today)
+  tomorrow.setDate(today.getDate() + 1)
+  // Calculate a month from now
+  const oneMonthFromNow = new Date(today)
+  oneMonthFromNow.setMonth(today.getMonth() + 1)
+  return <Calendar value={value} onChange={onChange} maxDate={oneMonthFromNow} minDate={tomorrow} showNeighboringMonth={false} />
+}
+
 // @ts-ignore
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
-
 function Payment({ value }: { value: Value }) {
   if (!value || Array.isArray(value)) value = null
   const datePart = value ? new Date(value).toLocaleDateString() : ''
 
   return (
-    <div className='mx-auto mt-8 max-w-md rounded-md bg-gray-100 p-4 shadow-md'>
-      <h2 className='mb-4 text-2xl font-bold'>Confirm Session and Checkout</h2>
-      <span className='mt-2 text-lg font-bold text-blue-500'>
-        <CalendarDaysIcon className='inline-block h-10 w-10' /> @{datePart}
-      </span>
+    <div className='mx-auto mt-8 max-w-md rounded-md bg-gray-100 p-4 py-7 text-center shadow-md'>
+      <h2 className='text-2xl font-bold'>Confirm Session and Checkout</h2>
+      <p className='mx-auto inline-block rounded-xl bg-white px-4 py-2 text-lg font-bold text-blue-500 shadow-xl'>@{datePart}</p>
+      <p className='mt-6 rounded-2xl px-2 py-4 font-semibold text-white shadow-[0_0_100px_5px_inset_black]'>
+        We will contact you on E-mail and arrange with you an appropriate time and session, so if you have any questions you're
+        free to ask!
+      </p>
     </div>
   )
 }

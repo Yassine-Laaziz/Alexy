@@ -5,7 +5,7 @@ import { sanityFetch } from '../sanity'
 import { product } from '@/types'
 import { urlFor } from '../sanity'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 

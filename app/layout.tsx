@@ -2,7 +2,7 @@ import '../styles/globals.css'
 import { Analytics } from '@vercel/analytics/react'
 import Navbar from '@/components/Navbar'
 import Providers from './Providers'
-import Newsletter from '@/components/Newsletter'
+import Footer from '@/components/Footer'
 
 export const metadata = {
   title: 'Alexy',
@@ -12,12 +12,12 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='en'>
-      <body>
+      <body className='bg-gradient-to-tl from-cyan-300 via-pink-300 to-cyan-300'>
         <Providers>
           <Navbar />
           {children}
-          <Newsletter />
           <Analytics />
+          <Footer />
         </Providers>
       </body>
     </html>

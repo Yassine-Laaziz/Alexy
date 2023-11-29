@@ -1,8 +1,9 @@
 import Carousel from '@/components/Carousel'
-import GetStarted from '@/components/GetStarted'
+import GetStarted from '@/components/3D Scenes/GetStarted'
 import Products from '@/components/Products'
 import { product, slide } from '@/types'
 import { sanityFetch } from '@/lib/sanity'
+import Newsletter from '@/components/Newsletter'
 
 export default async function Home() {
   const slides: slide[] = await sanityFetch('*[_type == "slide"]')
@@ -13,6 +14,7 @@ export default async function Home() {
       <Carousel slides={slides} />
       <GetStarted />
       <Products products={products} />
+      <Newsletter />
     </>
   )
 }

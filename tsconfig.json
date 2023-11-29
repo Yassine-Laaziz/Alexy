@@ -36,7 +36,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "components/3D Scenes/BeatingHeart.jsx"  ],
   "exclude": [
     "node_modules"
   ]
