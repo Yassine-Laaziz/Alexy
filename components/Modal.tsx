@@ -70,7 +70,7 @@ export default function Modal({ open, setOpen, product }: props) {
                   <Payment value={value} />,
                 ].map((Component, i) => (
                   <Transition
-                    key={`slide-${i}`}
+                    key={`Modal-Step-${i}`}
                     show={i === step}
                     enter='transition-all  duration-1000'
                     enterFrom='opacity-0'
@@ -159,8 +159,8 @@ function Payment({ value }: { value: Value }) {
       <h2 className='text-2xl font-bold'>Confirm Session and Checkout</h2>
       <p className='mx-auto inline-block rounded-xl bg-white px-4 py-2 text-lg font-bold text-blue-500 shadow-xl'>@{datePart}</p>
       <p className='mt-6 rounded-2xl px-2 py-4 font-semibold text-white shadow-[0_0_100px_5px_inset_black]'>
-        We will contact you on E-mail and arrange with you an appropriate time and session, so if you have any questions you're
-        free to ask!
+        We will contact you on E-mail and arrange with you an appropriate time and session, so if you have any questions
+        you&apos;re free to ask!
       </p>
     </div>
   )

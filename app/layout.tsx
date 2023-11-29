@@ -11,15 +11,15 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang='en'>
-      <body className='bg-gradient-to-tl from-cyan-300 via-pink-300 to-cyan-300'>
-        <Providers>
+    <Providers>
+      <html lang='en'>
+        <body className='dark:bg-gray-900'>
           <Navbar />
           {children}
           <Analytics />
           <Footer />
-        </Providers>
-      </body>
-    </html>
+        </body>
+      </html>
+    </Providers>
   )
 }

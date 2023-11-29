@@ -19,8 +19,8 @@ export default function Products({ products }: { products: product[] }) {
   return (
     <>
       <div
-        className='mx-auto
-        mb-40 mt-20 max-w-2xl px-4 py-16 shadow-[0_0_999px_100px_black_inset] sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8'
+        className='mx-auto mb-40
+        mt-20 max-w-2xl rounded-[30px] px-4 py-16 shadow-[0_0_999px_100px_black_inset] sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8'
       >
         <TitleText title='Services' textStyles='text-white text-center mb-8' />
         <motion.div
@@ -32,14 +32,14 @@ export default function Products({ products }: { products: product[] }) {
           {products.map((product, i) => (
             <motion.div
               key={`product${product.name}`}
-              className='group cursor-cell'
+              className='group cursor-cell text-center'
               variants={{
                 hidden: { y: 40, opacity: 0.3 },
                 show: { y: 0, opacity: 1 },
               }}
               onClick={() => handleClick(i)}
             >
-              <div className='aspect-h-1 aspect-w-1 h-72 w-72 overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7'>
+              <div className='aspect-h-1 aspect-w-1 h-72 w-72 overflow-hidden rounded-3xl bg-gray-200 xl:aspect-h-8 xl:aspect-w-7'>
                 <Image
                   src={urlFor(product.image).url()}
                   alt={product.name}

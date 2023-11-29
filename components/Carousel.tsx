@@ -18,8 +18,9 @@ export default function Carousel({ slides }: { slides: slide[] }) {
     const id: NodeJS.Timer = setInterval(() => {
       setActiveIndex(prevIndex => (prevIndex + 1) % slides.length)
     }, 5000)
+
     return () => clearInterval(id)
-  }, [activeIndex])
+  }, [activeIndex, slides.length])
 
   // navigation
   const goToSlide = (index: number) => setActiveIndex(index)

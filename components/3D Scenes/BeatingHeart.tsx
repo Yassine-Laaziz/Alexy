@@ -1,16 +1,15 @@
 import React, { useEffect, useRef } from 'react'
 import { useAnimations, useGLTF } from '@react-three/drei'
 
-export default function BeatingHeart(props) {
+export default function BeatingHeart(props: any) {
   const mesh = useRef()
-  const { scene, animations, materials } = useGLTF('/3D/BeatingHeart2.glb')
+  const { scene, animations } = useGLTF('/3D/BeatingHeart.glb')
   const { actions } = useAnimations(animations, mesh)
 
   useEffect(() => {
-    console.log(useGLTF('/3D/BeatingHeart2.glb'))
     actions?.HeartAction?.play()
     actions['PlusAction.001']?.play()
-  }, [])
+  }, [actions])
 
   return (
     <mesh ref={mesh} {...props}>
@@ -19,4 +18,4 @@ export default function BeatingHeart(props) {
   )
 }
 
-useGLTF.preload('/3D/BeatingHeart2.glb')
+useGLTF.preload('/3D/BeatingHeart.glb')
