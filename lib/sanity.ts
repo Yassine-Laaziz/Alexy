@@ -1,10 +1,8 @@
 import imageUrlBuilder from '@sanity/image-url'
 import { createClient } from '@sanity/client'
 
-export const sanityFetch = async (query: string) => {
-  const urlEncodedQuery = encodeURIComponent(query)
-
-  const req = await fetch(`https://ylkdw7rx.api.sanity.io/v2022-12-28/data/query/production?query=${urlEncodedQuery}`, {
+export async function sanityFetch(query: string) {
+  const req = await fetch(`https://ylkdw7rx.api.sanity.io/v2022-12-28/data/query/production?query=${encodeURIComponent(query)}`, {
     next: { tags: ['sanity'] },
   })
 
@@ -21,5 +19,4 @@ export const autoClient = createClient({
 })
 
 const builder = imageUrlBuilder(autoClient)
-
 export const urlFor = (sanitySrc: object) => builder.image(sanitySrc)

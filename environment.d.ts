@@ -1,14 +1,25 @@
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      GOOGLE_CLIENT_ID: string
-      GOOGLE_CLIENT_SECRET: string
+      // next-auth
       NEXTAUTH_URL: string
       URL: string
       NEXTAUTH_SECRET: string
+      // sanity
       SANITY_TOKEN: string
       SANITY_WEBHOOK_SECRET: string
+      // mongodb
       MONGODB_URI: string
+      // google provider
+      GOOGLE_CLIENT_ID: string
+      GOOGLE_CLIENT_SECRET: string
+      // stripe
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: string
+      STRIPE_SECRET_KEY: string
+      STRIPE_WEBHOOK_SECRET: string
+      // nodemailer
+      user: string
+      pass: string
     }
   }
 }
