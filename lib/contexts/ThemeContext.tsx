@@ -2,7 +2,7 @@ import { createContext, PropsWithChildren, useContext, useLayoutEffect, useState
 
 type Theme = 'light' | 'dark'
 
-interface ThemeContextProps {
+export interface ThemeContextProps {
   theme: Theme
   switchTheme: () => void
 }

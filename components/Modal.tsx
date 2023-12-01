@@ -12,6 +12,7 @@ import { pay } from '@/lib/ServerFunctions/Stripe'
 
 export default function Modal({ open, setOpen, product }: props) {
   const [step, setStep] = useState<number>(0)
+  const [prevStep, setPrevStep] = useState<number>(0)
   const [value, onChange] = useState<Value>(null)
 
   function handleNextStep() {
@@ -27,11 +28,13 @@ export default function Modal({ open, setOpen, product }: props) {
         closeButton: <FaXmark className='h-7 w-7 text-sky-300' />,
       })
     }
+    setPrevStep(step)
     setStep(prev => prev + 1)
   }
 
   function handleBackStep() {
     if (step === 0) return setOpen(false)
+    setPrevStep(step)
     setStep(prev => prev - 1)
   }
 
@@ -61,9 +64,12 @@ export default function Modal({ open, setOpen, product }: props) {
               leaveFrom='opacity-100 translate-y-0 sm:scale-100'
               leaveTo='opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'
             >
-              <Dialog.Panel className='relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg'>
+              <Dialog.Panel
+                className='relative max-h-fit transform overflow-hidden rounded-lg bg-white text-left shadow-xl
+               transition-all dark:bg-gray-900 dark:text-white sm:my-8 sm:w-full sm:max-w-lg'
+              >
                 <ToastContainer />
-
+                {/* Map the Steps and generalize an animation */}
                 {[
                   <Info product={product} key={`Component-Array-Element-1`} />,
                   <CustomCalendar value={value} onChange={onChange} key={`Component-Array-Element-2`} />,
@@ -72,18 +78,18 @@ export default function Modal({ open, setOpen, product }: props) {
                   <Transition
                     key={`Modal-Step-${i}`}
                     show={i === step}
-                    enter='transition-all  duration-1000'
-                    enterFrom='opacity-0'
-                    enterTo='opacity-100'
-                    leave='transition-opacity duration-1000'
-                    leaveFrom='opacity-100'
-                    leaveTo='opacity-0'
+                    enter='transition-all duration-1000'
+                    enterFrom={step >= prevStep ? 'opacity-0 translate-x-full' : 'opacity-0 -translate-x-full'}
+                    enterTo='opacity-100 translate-x-0'
+                    leave='transition-all duration-1000'
+                    leaveFrom='opacity-100 translate-x-0 absolute'
+                    leaveTo='opacity-0 translate-x-full hidden absolute'
                   >
                     {Component}
                   </Transition>
                 ))}
                 {/* Next Button */}
-                <div className='bg-gray-50 px-4 py-3 c:focus:border-2 sm:flex sm:flex-row-reverse sm:px-6'>
+                <div className='px-4 py-3 c:focus:border-2 sm:flex sm:flex-row-reverse sm:px-6'>
                   <button
                     autoFocus
                     type='button'
@@ -106,7 +112,8 @@ export default function Modal({ open, setOpen, product }: props) {
                   {/* Prev Button */}
                   <button
                     type='button'
-                    className='mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-cyan-400 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto'
+                    className='mt-3 inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold
+                    text-cyan-400 shadow-sm ring-1 ring-inset ring-gray-300 sm:mt-0 sm:w-auto'
                     onClick={handleBackStep}
                   >
                     {step === 0 ? 'Cancel' : 'Back'}
@@ -129,7 +136,7 @@ function Info({ product }: { product: product }) {
           <Dialog.Title as='h3' className='text-base font-semibold leading-6 text-pink-400'>
             {product.name}
           </Dialog.Title>
-          <p className='mt-2 pr-7 text-slate-500'>{product.description}</p>
+          <p className='mt-2 pr-7 text-slate-500 dark:text-white'>{product.description}</p>
         </div>
       </div>
       <p className='pr-6 text-right font-bold text-cyan-400'>{product.price}$</p>
@@ -155,7 +162,7 @@ function Payment({ value }: { value: Value }) {
   const datePart = value ? new Date(value).toLocaleDateString() : ''
 
   return (
-    <div className='mx-auto mt-8 max-w-md rounded-md bg-gray-100 p-4 py-7 text-center shadow-md'>
+    <div className='mx-auto mt-8 max-w-md rounded-md p-4 py-7 text-center shadow-md'>
       <h2 className='text-2xl font-bold'>Confirm Session and Checkout</h2>
       <p className='mx-auto inline-block rounded-xl bg-white px-4 py-2 text-lg font-bold text-blue-500 shadow-xl'>@{datePart}</p>
       <p className='mt-6 rounded-2xl px-2 py-4 font-semibold text-white shadow-[0_0_100px_5px_inset_black]'>

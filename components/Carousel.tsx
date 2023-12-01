@@ -29,7 +29,7 @@ export default function Carousel({ slides }: { slides: slide[] }) {
 
   return (
     isWide && (
-      <div className='relative h-[calc(100vh-64px)] overflow-hidden border-y-[1px] border-cyan-400 shadow-[0_0_50px_10px_inset_white]'>
+      <div className='relative h-[calc(100vh-64px)] overflow-hidden border-y-[1px] border-cyan-400 shadow-[0_0_50px_10px_inset_pink]'>
         {/* Slides */}
         <div className='relative flex h-full'>
           {slides.map((slide, index) => (

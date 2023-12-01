@@ -5,7 +5,7 @@ export default function Footer() {
       <div className='container mx-auto flex flex-col items-center'>
         <div className='mb-8 flex items-center space-x-4'>
           <a
-            href='https://www.instagram.com/'
+            href={process.env.clientYT || 'https://www.instagram.com/'}
             target='_blank'
             rel='noopener noreferrer'
             className='text-3xl transition duration-300 hover:text-gray-500'
@@ -13,7 +13,7 @@ export default function Footer() {
             <BsInstagram />
           </a>
           <a
-            href='https://www.youtube.com/'
+            href={process.env.clientYT || 'https://www.youtube.com/'}
             target='_blank'
             rel='noopener noreferrer'
             className='text-3xl transition duration-300 hover:text-gray-500'

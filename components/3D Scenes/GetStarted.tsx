@@ -1,10 +1,11 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
+import { useAnimations, useGLTF } from '@react-three/drei'
 import { fadeIn, staggerContainer } from '@/lib/motion'
 import { motion } from 'framer-motion'
 import { TypingText } from '../CustomTexts'
 import { Canvas } from '@react-three/fiber'
-import BeatingHeart from './BeatingHeart'
 import { OrbitControls } from '@react-three/drei'
 
 export default function GetStarted() {
@@ -12,8 +13,8 @@ export default function GetStarted() {
 
   return (
     <section
-      className='relative z-10 mx-auto mt-20 flex w-full flex-col items-center gap-8 overflow-hidden rounded-3xl 
-      bg-gradient-to-tl from-black via-gray-200 to-white p-8 py-7 shadow-[0_0_999px_100px_white_inset,0_0_100px_10px_white] sm:max-w-fit lg:flex-row'
+      className='relative z-10 mx-auto mt-20 flex w-full flex-col items-center gap-8 overflow-hidden rounded-3xl border-black bg-gradient-to-tl from-black
+      via-gray-200 to-white p-8 py-7 shadow-[0_0_999px_100px_white_inset,0_0_100px_10px_white] sm:max-w-fit sm:border-4 dark:sm:border-0 lg:flex-row'
     >
       <motion.div
         className='flex h-96 flex-1 items-center justify-center'
@@ -65,3 +66,22 @@ export default function GetStarted() {
     </section>
   )
 }
+
+export function BeatingHeart(props: any) {
+  const mesh = useRef()
+  const { scene, animations } = useGLTF('/3D/BeatingHeart.glb')
+  const { actions } = useAnimations(animations, mesh)
+
+  useEffect(() => {
+    actions?.HeartAction?.play()
+    actions['PlusAction.001']?.play()
+  }, [actions])
+
+  return (
+    <mesh ref={mesh} {...props}>
+      <primitive object={scene} />
+    </mesh>
+  )
+}
+
+useGLTF.preload('/3D/BeatingHeart.glb')

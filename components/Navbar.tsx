@@ -1,28 +1,27 @@
 'use client'
 
 import { Switch as Hswitch } from '@headlessui/react'
-import { useThemeContext } from '../lib/contexts/ThemeContext'
+import { ThemeContextProps, useThemeContext } from '../lib/contexts/ThemeContext'
 import { signIn, signOut, useSession } from 'next-auth/react'
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { classNames } from '../lib/utils/classNames'
-import Image from 'next/image'
-import { navVariants } from '@/lib/motion'
-import { motion } from 'framer-motion'
+import { motion, useScroll, useSpring } from 'framer-motion'
 import { FaBars } from 'react-icons/fa'
 import { FaGear, FaXmark } from 'react-icons/fa6'
 import { Session } from 'next-auth'
+import { ephesis } from '@/lib/fonts'
 
 const navigation = [{ name: 'Dashboard', href: '/', current: true }]
-const dropDown = [{ name: 'Settings', href: '#' }]
 
 export default function Navbar() {
   const { status, data } = useSession()
+  const { theme, switchTheme } = useThemeContext()
 
   return (
-    <nav>
-      <ScrollProgressBar />
-      <motion.div variants={navVariants} initial='hidden' whileInView='show'>
+    <>
+      <div className='h-[64px]' />
+      <div className='fixed top-0 z-[10000] w-full bg-white bg-opacity-75 transition-all dark:bg-black dark:bg-opacity-50'>
         <Disclosure as='nav'>
           {({ open }) => (
             <>
@@ -43,7 +42,7 @@ export default function Navbar() {
                     </Disclosure.Button>
                   </div>
                   <div className='flex flex-1 items-center justify-center sm:items-stretch sm:justify-start'>
-                    <Image src='/logo.jpg' alt='logo' className='block h-8 w-auto' width={240} height={180} />
+                    <h2 className={`text-4xl text-pink-500 ${ephesis.className}`}>Alexy</h2>
                     <div className='hidden sm:ml-6 sm:block'>
                       <div className='flex space-x-4'>
                         {navigation.map(item => (
@@ -62,12 +61,12 @@ export default function Navbar() {
                       </div>
                     </div>
                   </div>
-                  <Switch />
+                  <Switch theme={theme} switchTheme={switchTheme} />
                   {status === 'authenticated' ? (
-                    <ProfileDropDown data={data} />
+                    <ProfileDropDown data={data} switchTheme={switchTheme} />
                   ) : (
                     <button
-                      className='rounded-md bg-pink-400 px-3 py-2 text-sm font-medium text-white transition-all hover:bg-pink-300 hover:px-4 hover:py-3'
+                      className='rounded-md bg-pink-400 px-3 py-2 text-sm font-medium text-white transition-all hover:scale-125 hover:bg-pink-300'
                       onClick={() => signIn('google')}
                     >
                       SIGN IN
@@ -98,38 +97,29 @@ export default function Navbar() {
             </>
           )}
         </Disclosure>
-      </motion.div>
-    </nav>
+        <ScrollProgressBar />
+      </div>
+    </>
   )
 }
 
 function ScrollProgressBar() {
-  const [scrollPercentage, setScrollPercentage] = useState(0)
+  const { scrollYProgress } = useScroll()
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  })
 
-  const updateScrollPercentage = () => {
-    const windowHeight = window.innerHeight
-    const documentHeight = document.documentElement.scrollHeight - windowHeight
-    const scrollY = window.scrollY
-    const percentage = (scrollY / documentHeight) * 100
-
-    setScrollPercentage(percentage)
-  }
-
-  useEffect(() => {
-    window.addEventListener('scroll', updateScrollPercentage)
-    return () => {
-      window.removeEventListener('scroll', updateScrollPercentage)
-    }
-  }, [])
   return (
-    <div
-      className={`fixed left-0 top-0 z-[999] h-2 bg-cyan-400 shadow-[0_0_20px_5px_cyan] transition-all`}
-      style={{ width: `${scrollPercentage}%` }}
+    <motion.div
+      className={`fixed left-0 right-0 top-[calc(64px-8px)] h-2 bg-pink-400 shadow-[0_10px_30px_1px_pink]`}
+      style={{ scaleX }}
     />
   )
 }
 
-const ProfileDropDown = ({ data }: { data: Session }) => (
+const ProfileDropDown = ({ data, switchTheme }: { data: Session; switchTheme: () => void }) => (
   <Menu as='div' className='relative ml-3'>
     <Menu.Button className='rounded-xl bg-cyan-300'>
       <span className='sr-only'>Open user menu</span>
@@ -148,52 +138,42 @@ const ProfileDropDown = ({ data }: { data: Session }) => (
       leaveFrom='transform opacity-100 scale-100'
       leaveTo='transform opacity-0 scale-95'
     >
-      <Menu.Items className='absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
-        <>
-          {dropDown.map(item => (
-            <Menu.Item key={item.name}>
-              {({ active }) => (
-                <a href={item.href} className={classNames(active ? 'bg-rose-100' : '', 'block px-4 py-2 text-sm text-cyan-500')}>
-                  {item.name}
-                </a>
-              )}
-            </Menu.Item>
-          ))}
-          <Menu.Item>
-            {({ active }) => (
-              <button
-                onClick={() => signOut()}
-                className={classNames(
-                  active ? 'text-red-400' : 'text-rose-500',
-                  'block w-full px-4 py-2 text-left text-sm font-semibold'
-                )}
-              >
-                Sign out
-              </button>
-            )}
-          </Menu.Item>
-        </>
+      <Menu.Items className='absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-black'>
+        <Menu.Item>
+          <button
+            onClick={switchTheme}
+            className='block w-full px-4 py-2 text-left text-sm font-semibold transition-all hover:text-base'
+          >
+            <span className='text-black dark:hidden'>Dark mode</span>
+            <span className='hidden text-cyan-400 dark:inline-block'>Light mode</span>
+          </button>
+        </Menu.Item>
+        <Menu.Item>
+          <button
+            onClick={() => signOut()}
+            className='block w-full px-4 py-2 text-left text-sm font-semibold text-red-500 transition-all hover:text-base'
+          >
+            Sign out
+          </button>
+        </Menu.Item>
       </Menu.Items>
     </Transition>
   </Menu>
 )
 
-export function Switch() {
-  const { theme, switchTheme } = useThemeContext()
-
-  return (
-    <Hswitch
-      checked={theme === 'dark'}
-      onChange={switchTheme}
-      className={`${theme === 'dark' ? 'bg-teal-500' : 'bg-teal-300'}
-          relative inline-flex h-[38px] w-[74px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
-    >
-      <span className='sr-only'>Use setting</span>
-      <span
-        aria-hidden='true'
-        className={`${theme === 'dark' ? 'translate-x-9' : 'translate-x-0'}
-            pointer-events-none inline-block h-[34px] w-[34px] transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out`}
-      />
-    </Hswitch>
-  )
-}
+const Switch = ({ theme, switchTheme }: ThemeContextProps) => (
+  <Hswitch
+    checked={theme === 'dark'}
+    onChange={switchTheme}
+    className='relative mr-4 inline-flex h-[38px] w-[74px] shrink-0 cursor-pointer
+       rounded-full border-2 border-transparent bg-cyan-300 transition-colors duration-200 ease-in-out focus:outline-none
+        focus-visible:ring-2 focus-visible:ring-white  focus-visible:ring-opacity-75 dark:bg-pink-500'
+  >
+    <span className='sr-only'>Use setting</span>
+    <span
+      aria-hidden='true'
+      className='pointer-events-none inline-block h-[34px] w-[34px] translate-x-0 transform rounded-full bg-white shadow-lg
+         ring-0 transition duration-200 ease-in-out dark:translate-x-9 dark:bg-white'
+    />
+  </Hswitch>
+)
